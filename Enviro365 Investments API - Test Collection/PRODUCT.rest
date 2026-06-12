@@ -1,0 +1,16 @@
+### ============================================
+### PRODUCTS ENDPOINTS
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "productName": "Retirement Fund",
+  "productType": "RETIREMENT"
+}
+

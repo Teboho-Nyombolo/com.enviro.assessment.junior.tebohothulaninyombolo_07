@@ -1,0 +1,42 @@
+### ============================================
+### AUTHENTICATION
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+
+### Register a new investor (Age < 65 for retirement test)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Teboho",
+  "lastName": "Nyombolo",
+  "email": "tebohonyombolo@gmail.com",
+  "password": "teboho123",
+  "dateOfBirth": "1996-06-07"
+}
+
+### Register a new investor (Age > 65 for retirement test)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Robert",
+  "lastName": "Mugabe",
+  "email": "robert.mugabe@email.com",
+  "password": "password123",
+  "dateOfBirth": "1950-01-01"
+}
+
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "robert.mugabe@email.com",
+  "password": "password123"
+}
+

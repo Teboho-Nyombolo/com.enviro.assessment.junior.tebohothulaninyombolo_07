@@ -1,0 +1,17 @@
+### ============================================
+### INVESTMENTS ENDPOINTS
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+POST {{baseUrl}}/investments
+Content-Type: application/json
+Authorization: Bearer 7cff5ad4-4749-4e67-bd4c-b31dff1e3e52
+
+{
+  "investorId": 1,
+  "productName": "Rainy Days",
+  "productType": "SAVINGS",
+  "initialDeposit": 10000
+}

@@ -1,0 +1,19 @@
+### ============================================
+### PORTFOLIO ENDPOINTS
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+### Get portfolio by ID (no auth required)
+GET {{baseUrl}}/portfolios/1
+
+### Get my portfolio (requires Bearer token from login)
+GET {{baseUrl}}/portfolios/me
+Authorization: Bearer b1df4935-8f3f-4095-9396-60cb9f95f103
+
+### Get portfolio for investor 2 (Age 35, has investment products)
+GET {{baseUrl}}/portfolios/2
+
+### Get portfolio - non-existent investor (should return 404)
+GET {{baseUrl}}/portfolios/99999

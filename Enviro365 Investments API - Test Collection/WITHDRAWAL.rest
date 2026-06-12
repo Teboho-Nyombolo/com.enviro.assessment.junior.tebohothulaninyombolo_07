@@ -1,0 +1,39 @@
+### ============================================
+### WITHDRAWAL ENDPOINTS
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+### Create withdrawal - SUCCESS
+POST {{baseUrl}}/withdrawals
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "productId": 1,
+  "amount": 50000.00
+}
+
+### Create withdrawal - FAIL (exceeds balance)
+POST {{baseUrl}}/withdrawals
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "productId": 1,
+  "amount": 999999.00
+}
+
+### Create withdrawal - FAIL (exceeds 90%)
+POST {{baseUrl}}/withdrawals
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "productId": 1,
+  "amount": 95000.00
+}
+
+### Get withdrawal history
+GET {{baseUrl}}/withdrawals/history/1

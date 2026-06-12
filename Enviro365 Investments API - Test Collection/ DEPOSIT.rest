@@ -1,0 +1,17 @@
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+POST {{baseUrl}}/deposits
+Content-Type: application/json
+Authorization: Bearer b1df4935-8f3f-4095-9396-60cb9f95f103
+
+{
+ "investorId": 1,
+  "productId": 1,
+  "amount": 20000000.00
+}
+
+### Get deposit history
+GET {{baseUrl}}/deposits/history/1
+Authorization: Bearer b1df4935-8f3f-4095-9396-60cb9f95f103

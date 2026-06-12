@@ -1,0 +1,26 @@
+### ============================================
+### CSV EXPORT ENDPOINTS
+### ============================================
+
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+### Export all withdrawals
+POST {{baseUrl}}/export/csv
+Content-Type: application/json
+
+{
+  "investorId": 1
+}
+
+### Export with filters
+POST {{baseUrl}}/export/csv
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "productId": 1,
+  "fromDate": "2026-01-01",
+  "toDate": "2026-12-31",
+  "status": "COMPLETED"
+}
