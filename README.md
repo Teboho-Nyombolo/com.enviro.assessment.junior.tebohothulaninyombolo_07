@@ -85,6 +85,7 @@ cd frontend
 
 # 2. Install dependencies
 npm install
+npm install --legacy-peer-deps
 
 # 3. Start the Angular development server
 ng serve
