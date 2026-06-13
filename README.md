@@ -210,80 +210,8 @@ If an investor has a balance of R10,000:
  Withdrawal of R9,500: Rejected (exceeds 90% limit)
  Withdrawal of R15,000: Rejected (exceeds balance)
 
-Project Structure
-plain
-enviro365-assessment/
-├── 📁 backend/
-│   └── src/main/java/com/enviro/assessment/junior/tebohothulaninyombolo/
-│       ├── 📄 Application.java
-│       ├── 📁 config/
-│       │   ├── 📄 SecurityConfig.java
-│       │   ├── 📄 CorsConfig.java
-│       │   └── 📄 PasswordConfig.java
-│       ├── 📁 controller/
-│       │   ├── 📄 AuthController.java
-│       │   ├── 📄 InvestmentController.java
-│       │   ├── 📄 PortfolioController.java
-│       │   ├── 📄 DepositController.java
-│       │   ├── 📄 WithdrawalController.java
-│       │   └── 📄 ExportController.java
-│       ├── 📁 service/
-│       │   ├── 📄 AuthService.java
-│       │   ├── 📄 UserDetailsServiceImpl.java
-│       │   ├── 📄 InvestmentService.java
-│       │   ├── 📄 PortfolioService.java
-│       │   ├── 📄 DepositService.java
-│       │   └── 📄 WithdrawalService.java
-│       ├── 📁 repository/
-│       │   ├── 📄 InvestorRepository.java
-│       │   ├── 📄 InvestmentRepository.java
-│       │   ├── 📄 PortfolioRepository.java
-│       │   ├── 📄 DepositRepository.java
-│       │   └── 📄 WithdrawalRepository.java
-│       ├── 📁 model/
-│       │   ├── 📄 Investor.java
-│       │   ├── 📄 Investment.java
-│       │   ├── 📄 Portfolio.java
-│       │   ├── 📄 Deposit.java
-│       │   ├── 📄 Withdrawal.java
-│       │   └── 📄 ApiResponse.java
-│       ├── 📁 dto/
-│       │   ├── 📄 LoginRequest.java
-│       │   ├── 📄 RegisterRequest.java
-│       │   ├── 📄 WithdrawalRequest.java
-│       │   └── 📄 InvestmentRequest.java
-│       └── 📁 exception/
-│           ├── 📄 GlobalExceptionHandler.java
-│           ├── 📄 ResourceNotFoundException.java
-│           └── 📄 ValidationException.java
-│
-└── 📁 frontend/
-    └── src/app/
-        ├── 📁 core/
-        │   ├── 📁 services/
-        │   │   ├── 📄 auth.service.ts
-        │   │   ├── 📄 investment.service.ts
-        │   │   ├── 📄 portfolio.service.ts
-        │   │   ├── 📄 deposit.service.ts
-        │   │   └── 📄 withdrawal.service.ts
-        │   ├── 📁 interceptors/
-        │   │   └── 📄 auth.interceptor.ts
-        │   └── 📁 guards/
-        │       └── 📄 auth.guard.ts
-        ├── 📁 store/
-        │   └── 📁 auth/
-        │       ├── 📄 auth.actions.ts
-        │       ├── 📄 auth.reducer.ts
-        │       ├── 📄 auth.selectors.ts
-        │       └── 📄 auth.effects.ts
-        ├── 📁 features/
-        │   ├── 📁 auth/
-        │   │   └── 📄 auth.component.ts
-        │   └── 📁 dashboard/
-        │       └── 📄 dashboard.component.ts
-        └── 📁 models/
-            ├── 📄 investor.model.ts
-            └── 📄 api-response.model.ts
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/b44272bb-c309-4e6b-9061-66b50de1928b" />
+
 
  Database Schema
 Investor Table
