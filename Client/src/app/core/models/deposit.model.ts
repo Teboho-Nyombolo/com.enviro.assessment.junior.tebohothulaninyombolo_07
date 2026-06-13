@@ -4,17 +4,15 @@ export interface DepositRequest {
 }
 
 export interface DepositResponse {
-  id: number;
-  investorId: number;
-  investorName: string;
-  productId: number;
-  productName: string;
-  amount: number;
-  previousBalance: number;
-  newBalance: number;
-  depositDate: string;
-  status: string;
-  message: string;
+    id: number;
+    investorId: number;
+    investorName: string;
+    investmentId: number;       // API sends this, not productId
+    investmentName: string;      // API sends this, not productName
+    amount: number;
+    depositDate: string;
+    status: string;
+    reference: string;           // API sends this too
 }
 
 export interface ProductOption {

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import {filter, Observable, Subject, takeUntil} from 'rxjs';
 import { Router } from '@angular/router';
 
 import { logout } from '../../store/auth/auth.actions';
@@ -19,7 +19,7 @@ import {WithdrawalHistory, WithdrawalRequest} from '../../core/models/withdrawal
 import {DepositRequest, DepositResponse} from '../../core/models/deposit.model';
 import { InvestmentService, CreateInvestmentRequest } from '../../core/services/investment.service';
 import { CsvExportService } from '../../core/services/csv-export.service';
-import {tap} from "rxjs/operators";
+import {take, tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-dashboard',
@@ -403,7 +403,7 @@ import {tap} from "rxjs/operators";
                   <tr *ngFor="let item of depositHistory; let last = last"
                       class="hover:bg-gray-50/50 transition-colors duration-150"
                       [class.border-b]="!last" [class.border-gray-50]="!last">
-                    <td class="py-4 px-6 font-semibold text-black">{{ item.productName }}</td>
+                    <td class="py-4 px-6 font-semibold text-black">{{ item.investmentName }}</td>
                     <td class="py-4 px-6 text-right font-semibold text-black">R {{ item.amount | number:'1.2-2' }}</td>
                     <td class="py-4 px-6 text-gray-400 text-sm">{{ item.depositDate | date:'mediumDate' }}</td>
                     <td class="py-4 px-6">
@@ -454,7 +454,7 @@ import {tap} from "rxjs/operators";
                   <tr *ngFor="let item of history; let last = last"
                       class="hover:bg-gray-50/50 transition-colors duration-150"
                       [class.border-b]="!last" [class.border-gray-50]="!last">
-                    <td class="py-4 px-6 font-semibold text-black">{{ item.productName }}</td>
+                    <td class="py-4 px-6 font-semibold text-black">{{ item.investmentName }}</td>
                     <td class="py-4 px-6 text-right font-semibold text-black">R {{ item.amount | number:'1.2-2' }}</td>
                     <td class="py-4 px-6 text-gray-400 text-sm">{{ item.withdrawalDate | date:'mediumDate' }}</td>
                     <td class="py-4 px-6">
@@ -537,18 +537,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (investor?.id) {
 
         this.currentInvestorId = investor.id;
-        console.log('Investor loaded with ID:', this.currentInvestorId);
-
         this.store.dispatch(loadPortfolio({ investorId: investor.id }));
         this.store.dispatch(loadWithdrawalHistory({ investorId: investor.id }));
         this.store.dispatch(loadDepositHistory({ investorId: investor.id }));
       }
     });
-
-      this.portfolio$.pipe(
-          takeUntil(this.destroy$),
-          tap(p => console.log('Template portfolio$ emission:', p?.totalBalance, typeof p?.totalBalance))
-      ).subscribe();
 
     this.withdrawalSuccess$.pipe(takeUntil(this.destroy$)).subscribe(success => {
       if (success) {
@@ -604,11 +597,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.newProductName || !this.newProductType || this.newInitialDeposit <= 0) return;
 
     this.investor$.pipe(takeUntil(this.destroy$)).subscribe(investor => {
-      console.log('Investor from store:', investor);  // DEBUG
-      console.log('Investor ID from store:', investor?.id);  // DEBUG
-      console.log('Token in localStorage:', localStorage.getItem('auth_token'));  // DEBUG
-
-      if (!investor?.id) return;
+        if (!investor?.id) return;
 
       this.creatingInvestment = true;
       this.investmentError = null;
@@ -682,36 +671,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDepositSubmit() {
-    console.log('Deposit submit - currentInvestorId:', this.currentInvestorId);
+    onDepositSubmit() {
+        this.store.select(selectInvestor).pipe(
+            take(1),
+            filter((inv): inv is Investor => !!inv?.id)
+        ).subscribe(investor => {
+            const investorId = investor.id;
 
-    if (!this.currentInvestorId) {
-      console.error('No investor ID available for deposit');
-      return;
+            console.log('Deposit submit - investorId:', investorId);
+
+            if (!this.depositProductId || this.depositAmount <= 0) {
+                console.error('Invalid deposit data:', {
+                    investmentId: this.depositProductId,
+                    amount: this.depositAmount
+                });
+                return;
+            }
+
+            const request: DepositRequest = {
+                investmentId: this.depositProductId,
+                amount: this.depositAmount
+            };
+
+            this.store.dispatch(createDeposit({ request, investorId }));
+
+            setTimeout(() => {
+                this.store.dispatch(loadDepositHistory({ investorId }));
+            }, 500);
+        });
     }
-    if (!this.depositProductId || this.depositAmount <= 0) {
-      console.error('Invalid deposit data:', {
-        productId: this.depositProductId,
-        amount: this.depositAmount
-      });
-      return;
-    }
-
-    const request: DepositRequest = {
-      investmentId: this.depositProductId,
-      amount: this.depositAmount
-    };
-
-    const investorId = this.currentInvestorId;
-
-    this.store.dispatch(createDeposit({ request, investorId }));
-
-    // Reload history after deposit
-    setTimeout(() => {
-      console.log('Reloading deposit history for investor:', investorId);
-      this.store.dispatch(loadDepositHistory({ investorId }));
-    }, 500);
-  }
 
   onWithdrawalSubmit() {
     console.log('Withdrawal submit - currentInvestorId:', this.currentInvestorId);
