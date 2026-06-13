@@ -344,30 +344,30 @@ Screenshots
  
  Login Page
 <p align="center">
-  <img src="screenshots/login.png" alt="Login Page" width="80%">
+  <img width="1972" height="1202" alt="image" src="https://github.com/user-attachments/assets/73f02568-c92f-4faf-9063-3efa308ed487" />
 </p>
 <p align="center"><em>Investor authentication with email and password</em></p>
  Portfolio Dashboard
 <p align="center">
-  <img src="screenshots/dashboard.png" alt="Portfolio Dashboard" width="80%">
+<img width="1170" height="542" alt="image" src="https://github.com/user-attachments/assets/f2d78223-695e-4093-9276-e3a39bf1aa92" />
 </p>
 <p align="center"><em>Portfolio overview showing total balance and investment products</em></p>
 
  Withdrawal Form
 <p align="center">
-  <img src="screenshots/withdrawal-form.png" alt="Withdrawal Form" width="80%">
+<img width="570" height="348" alt="image" src="https://github.com/user-attachments/assets/e6a53af5-da1e-4d34-affc-f4f72b0afb02" />
 </p>
 <p align="center"><em>Withdrawal submission with type selection and amount input</em></p>
 
  Withdrawal History
 <p align="center">
-  <img src="screenshots/withdrawal-history.png" alt="Withdrawal History" width="80%">
+<img width="1124" height="202" alt="image" src="https://github.com/user-attachments/assets/ad31ffeb-7aa2-4513-b047-3940de5c30d2" />
 </p>
 <p align="center"><em>Table showing all withdrawal transactions with status</em></p>
 
  CSV Export
 <p align="center">
-  <img src="screenshots/csv-export.png" alt="CSV Export" width="80%">
+<img width="1294" height="308" alt="image" src="https://github.com/user-attachments/assets/00f2024b-b836-4a1e-b399-e435afc46ce3" />
 </p>
 <p align="center"><em>Download withdrawal statements with date filtering</em></p>
 
