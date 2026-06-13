@@ -19,6 +19,7 @@ import {WithdrawalHistory, WithdrawalRequest} from '../../core/models/withdrawal
 import {DepositRequest, DepositResponse} from '../../core/models/deposit.model';
 import { InvestmentService, CreateInvestmentRequest } from '../../core/services/investment.service';
 import { CsvExportService } from '../../core/services/csv-export.service';
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-dashboard',
@@ -62,15 +63,19 @@ import { CsvExportService } from '../../core/services/csv-export.service';
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div class="bg-black rounded-2xl p-6 text-white shadow-xl shadow-black/10">
             <p class="text-white/60 text-xs font-semibold uppercase tracking-wider">Total Balance</p>
-            <p class="text-3xl font-bold mt-3 tracking-tight">
-              R {{ (portfolio$ | async)?.totalBalance ?? 0 | number:'1.2-2' }}
-            </p>
+              <p class="text-3xl font-bold mt-3 tracking-tight">
+                  <ng-container *ngIf="portfolio$ | async as portfolio">
+                      R {{ (portfolio.totalBalance || 0) | number:'1.2-2' }}
+                  </ng-container>
+              </p>
             <p class="text-white/40 text-xs mt-2">All products combined</p>
           </div>
           <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
             <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Available for Withdrawal</p>
             <p class="text-3xl font-bold text-black mt-3 tracking-tight">
-              R {{ (portfolio$ | async)?.totalAvailableForWithdrawal ?? 0 | number:'1.2-2' }}
+                <ng-container *ngIf="portfolio$ | async as portfolio">
+                    R {{ (portfolio.totalAvailableForWithdrawal || 0) | number:'1.2-2' }}
+                </ng-container>
             </p>
             <p class="text-gray-300 text-xs mt-2">90% of total balance</p>
           </div>
@@ -241,9 +246,9 @@ import { CsvExportService } from '../../core/services/csv-export.service';
                         {{ product.productType }}
                       </span>
                   </td>
-                  <td class="py-4 px-6 text-right font-semibold text-black">
-                    R {{ product.balance | number:'1.2-2' }}
-                  </td>
+                    <td class="py-4 px-6 text-right font-semibold text-black">
+                        R {{ product.currentBalance | number:'1.2-2' }}
+                    </td>
                   <td class="py-4 px-6 text-right text-gray-400">
                     R {{ product.maxWithdrawalAmount | number:'1.2-2' }}
                   </td>
@@ -271,7 +276,7 @@ import { CsvExportService } from '../../core/services/csv-export.service';
                             class="...">
                       <option [ngValue]="null" disabled selected>Select product...</option>
                       <option *ngFor="let p of portfolio.products" [ngValue]="p">
-                        {{ p.productName }} ({{ p.productType }}) - R {{ p.balance | number:'1.2-2' }}
+                        {{ p.productName }} ({{ p.productType }}) - R {{ p.currentBalance | number:'1.2-2' }}
                       </option>
                     </select>
                   </div>
@@ -320,7 +325,7 @@ import { CsvExportService } from '../../core/services/csv-export.service';
                             class="...">
                       <option [ngValue]="null" disabled selected>Select product...</option>
                       <option *ngFor="let p of portfolio.products" [ngValue]="p">
-                        {{ p.productName }} ({{ p.productType }}) - R {{ p.balance | number:'1.2-2' }}
+                        {{ p.productName }} ({{ p.productType }}) - R {{ p.currentBalance | number:'1.2-2' }}
                       </option>
                     </select>
                   </div>
@@ -540,6 +545,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
 
+      this.portfolio$.pipe(
+          takeUntil(this.destroy$),
+          tap(p => console.log('Template portfolio$ emission:', p?.totalBalance, typeof p?.totalBalance))
+      ).subscribe();
+
     this.withdrawalSuccess$.pipe(takeUntil(this.destroy$)).subscribe(success => {
       if (success) {
         setTimeout(() => this.store.dispatch(clearWithdrawalState()), 3000);
@@ -556,6 +566,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+    getFormattedBalance(portfolio: Portfolio | null): string {
+        const balance = portfolio?.totalBalance ?? 0;
+        return new Intl.NumberFormat('en-ZA', {
+            style: 'currency',
+            currency: 'ZAR',
+            minimumFractionDigits: 2
+        }).format(balance);
+    }
 
   ngOnDestroy() {
     this.destroy$.next();
