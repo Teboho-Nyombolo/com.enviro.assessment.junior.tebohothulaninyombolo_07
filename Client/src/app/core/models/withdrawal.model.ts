@@ -4,23 +4,23 @@ export interface WithdrawalRequest {
 }
 
 export interface WithdrawalResponse {
-  id: number;
-  investorId: number;
-  investorName: string;
-  productId: number;
-  productName: string;
-  amount: number;
-  previousBalance: number;
-  newBalance: number;
-  withdrawalDate: string;
-  status: string;
-  reference?: string;
-  createdAt?: string;
+    id: number;
+    investorId: number;
+    investorName: string;
+    investmentId: number;
+    investmentName: string;
+    amount: number;
+    withdrawalDate: string;
+    status: string;
+    reference?: string;
+    maxWithdrawalAmount?: number;
+    withdrawalPercentage?: number;
+    remainingBalance?: number;
 }
 
 export interface WithdrawalHistory {
   id: number;
-  productName: string;
+  investmentName: string;  // Change from productName
   amount: number;
   withdrawalDate: string;
   status: string;

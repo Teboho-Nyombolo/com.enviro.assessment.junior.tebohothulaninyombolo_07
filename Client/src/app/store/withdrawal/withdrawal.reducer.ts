@@ -23,17 +23,20 @@ export const withdrawalReducer = createReducer(
   on(WithdrawalActions.createWithdrawal, WithdrawalActions.loadWithdrawalHistory, state => ({
     ...state, loading: true, error: null, success: false
   })),
-  on(WithdrawalActions.createWithdrawalSuccess, (state, { response }) => ({
-    ...state,
-    lastWithdrawal: response,
-    history: [{
-      ...response,
-      createdAt: new Date().toISOString()
-    } as WithdrawalHistory, ...state.history],
-    loading: false,
-    success: true,
-    error: null
-  })),
+    on(WithdrawalActions.createWithdrawalSuccess, (state, { response }) => ({
+        ...state,
+        lastWithdrawal: response,
+        history: [{
+            ...response,
+            productId: response.investmentId ,
+            productName: response.investmentName ,
+            createdAt: new Date().toISOString()
+        } as WithdrawalHistory, ...state.history],
+        loading: false,
+        success: true,
+        error: null
+    })),
+
   on(WithdrawalActions.createWithdrawalFailure, (state, { error }) => ({
     ...state, loading: false, success: false, error
   })),

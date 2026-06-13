@@ -18,22 +18,17 @@ export class AuthEffects {
       mergeMap(({ request }) =>
         this.authService.login(request.email, request.password).pipe(
           map(response => {
-            console.log('📝 Login response:', response);
-
             const investor = response.data;
             const token = investor.token || '';
 
-            console.log('📝 Token received:', token);
 
             if (token) {
               localStorage.setItem('auth_token', token);
-              console.log('📝 Token saved to localStorage');
             }
 
             return AuthActions.loginSuccess({ investor, token });
           }),
           catchError(error => {
-            console.error('📝 Login error:', error);
             return of(AuthActions.loginFailure({
               error: error.error?.message || 'Login failed.'
             }));
