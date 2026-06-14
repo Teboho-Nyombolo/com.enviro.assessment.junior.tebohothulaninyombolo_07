@@ -33,14 +33,14 @@ import { selectAuthLoading, selectAuthError } from '../../store/auth/auth.select
               <input type="text" [(ngModel)]="firstName" name="firstName" required
                      class="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-black placeholder-gray-300
                             focus:ring-2 focus:ring-black focus:bg-white transition-all duration-200"
-                     placeholder="John">
+                     placeholder="First Name">
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Last Name</label>
               <input type="text" [(ngModel)]="lastName" name="lastName" required
                      class="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-black placeholder-gray-300
                             focus:ring-2 focus:ring-black focus:bg-white transition-all duration-200"
-                     placeholder="Doe">
+                     placeholder="Last Name">
             </div>
           </div>
 
@@ -50,7 +50,7 @@ import { selectAuthLoading, selectAuthError } from '../../store/auth/auth.select
             <input type="email" [(ngModel)]="email" name="email" required
                    class="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-black placeholder-gray-300
                           focus:ring-2 focus:ring-black focus:bg-white transition-all duration-200"
-                   placeholder="you@example.com">
+                   placeholder="fullname@example.com">
           </div>
 
           <!-- Password -->
@@ -59,7 +59,7 @@ import { selectAuthLoading, selectAuthError } from '../../store/auth/auth.select
             <input type="password" [(ngModel)]="password" name="password" required minlength="6"
                    class="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl text-black placeholder-gray-300
                           focus:ring-2 focus:ring-black focus:bg-white transition-all duration-200"
-                   placeholder="••••••••">
+                   placeholder="********">
           </div>
 
           <!-- Date of Birth (register only) -->

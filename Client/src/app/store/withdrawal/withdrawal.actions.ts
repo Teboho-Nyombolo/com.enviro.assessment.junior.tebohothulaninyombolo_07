@@ -4,7 +4,11 @@ import { WithdrawalRequest, WithdrawalResponse, WithdrawalHistory } from '../../
 export const createWithdrawal = createAction(
   '[Withdrawal] Create',
   props<{ request: WithdrawalRequest; investorId: number }>()
-);export const createWithdrawalSuccess = createAction('[Withdrawal] Create Success', props<{ response: WithdrawalResponse }>());
+);
+export const createWithdrawalSuccess = createAction(
+    '[Withdrawal] Create Withdrawal Success',
+    props<{ response: WithdrawalResponse; investorId: number }>()
+);
 export const createWithdrawalFailure = createAction('[Withdrawal] Create Failure', props<{ error: string }>());
 
 export const loadWithdrawalHistory = createAction('[Withdrawal] Load History', props<{ investorId: number }>());

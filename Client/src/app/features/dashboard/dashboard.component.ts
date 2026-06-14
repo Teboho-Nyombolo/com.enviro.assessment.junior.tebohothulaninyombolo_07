@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
+import { filter, map, Observable, shareReplay, Subject, take, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { logout } from '../../store/auth/auth.actions';
@@ -142,11 +142,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         private csvExportService: CsvExportService,
         private investmentService: InvestmentService
     ) {
-        this.investor$ = this.store.select(selectInvestor);
-        this.portfolio$ = this.store.select(selectPortfolio);
+        this.investor$ = this.store.select(selectInvestor).pipe(shareReplay(1));
+        this.portfolio$ = this.store.select(selectPortfolio).pipe(shareReplay(1));
         this.portfolioLoading$ = this.store.select(selectPortfolioLoading);
 
-        // Derive boolean flags from portfolio$ to control conditional rendering
         this.hasPortfolio$ = this.portfolio$.pipe(
             map(p => !!p && Array.isArray(p.products) && p.products.length > 0)
         );
@@ -166,12 +165,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.investor$.pipe(takeUntil(this.destroy$)).subscribe(investor => {
-            if (investor?.id) {
-                this.store.dispatch(loadPortfolio({ investorId: investor.id }));
-                this.store.dispatch(loadWithdrawalHistory({ investorId: investor.id }));
-                this.store.dispatch(loadDepositHistory({ investorId: investor.id }));
-            }
+
+        this.investor$.pipe(
+            takeUntil(this.destroy$),
+            filter((investor): investor is Investor => !!investor && typeof investor.id === 'number')
+        ).subscribe(investor => {
+            const investorId = investor.id;
+            this.store.dispatch(loadPortfolio({ investorId }));
+            this.store.dispatch(loadWithdrawalHistory({ investorId }));
+            this.store.dispatch(loadDepositHistory({ investorId }));
         });
 
         this.withdrawalSuccess$.pipe(takeUntil(this.destroy$)).subscribe(success => {
@@ -197,24 +199,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     refreshData() {
-        this.investor$.pipe(takeUntil(this.destroy$)).subscribe(i => {
-            if (i?.id) {
-                this.store.dispatch(loadPortfolio({ investorId: i.id }));
-                this.store.dispatch(loadWithdrawalHistory({ investorId: i.id }));
-                this.store.dispatch(loadDepositHistory({ investorId: i.id }));
-            }
+        this.store.select(selectInvestor).pipe(
+            take(1),
+            filter((investor): investor is Investor => !!investor && typeof investor.id === 'number')
+        ).subscribe(investor => {
+            const investorId = investor.id;
+            this.store.dispatch(loadPortfolio({ investorId }));
+            this.store.dispatch(loadWithdrawalHistory({ investorId }));
+            this.store.dispatch(loadDepositHistory({ investorId }));
         });
     }
 
     onCreateInvestment(event: { productName: string; productType: string; initialDeposit: number }) {
-        this.investor$.pipe(takeUntil(this.destroy$)).subscribe(investor => {
-            if (!investor?.id) return;
-
+        this.store.select(selectInvestor).pipe(
+            take(1),
+            filter((investor): investor is Investor => !!investor && typeof investor.id === 'number')
+        ).subscribe(investor => {
+            const investorId = investor.id;
             this.creatingInvestment = true;
             this.investmentError = null;
 
             const request: CreateInvestmentRequest = {
-                investorId: investor.id,
+                investorId: investorId,
                 productName: event.productName,
                 productType: event.productType,
                 initialDeposit: event.initialDeposit
@@ -238,7 +244,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     onDeposit(event: { investmentId: number; amount: number }) {
         this.store.select(selectInvestor).pipe(
             take(1),
-            filter((inv): inv is Investor => !!inv?.id)
+            filter((investor): investor is Investor => !!investor && typeof investor.id === 'number')
         ).subscribe(investor => {
             const investorId = investor.id;
             const request: DepositRequest = {
@@ -246,29 +252,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 amount: event.amount
             };
             this.store.dispatch(createDeposit({ request, investorId }));
-            setTimeout(() => {
-                this.store.dispatch(loadDepositHistory({ investorId }));
-            }, 500);
         });
     }
 
     onWithdrawal(event: { investmentId: number; amount: number }) {
         this.store.select(selectInvestor).pipe(
             take(1),
-            filter((inv): inv is Investor => !!inv?.id)
+            filter((investor): investor is Investor => !!investor && typeof investor.id === 'number')
         ).subscribe(investor => {
             const investorId = investor.id;
-
             const request: WithdrawalRequest = {
                 investmentId: event.investmentId,
                 amount: event.amount
             };
-
             this.store.dispatch(createWithdrawal({ request, investorId }));
-
-            setTimeout(() => {
-                this.store.dispatch(loadWithdrawalHistory({ investorId }));
-            }, 500);
         });
     }
 
