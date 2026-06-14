@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { logout } from '../../store/auth/auth.actions';
@@ -57,49 +57,51 @@ import { WithdrawalHistoryComponent } from '../tables/withdrawal-history.compone
 
             <!-- NO PORTFOLIO: Show "Start Investing" -->
             <app-start-investing
-                    *ngIf="(portfolio$ | async) === null && !(portfolioLoading$ | async)"
+                    *ngIf="hasNoPortfolio$ | async"
                     [creatingInvestment]="creatingInvestment"
                     [investmentError]="investmentError"
                     (createInvestment)="onCreateInvestment($event)">
             </app-start-investing>
 
             <!-- PORTFOLIO EXISTS: Full Dashboard -->
-            <ng-container *ngIf="portfolio$ | async as portfolio">
-                <!-- Products Table -->
-                <app-products-table
-                        [portfolio]="portfolio"
-                        [creatingInvestment]="creatingInvestment"
-                        (addProduct)="onCreateInvestment($event)">
-                </app-products-table>
-
-                <!-- Two Column Layout: Deposit & Withdrawal Forms -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <app-deposit-form
+            <ng-container *ngIf="hasPortfolio$ | async">
+                <ng-container *ngIf="portfolio$ | async as portfolio">
+                    <!-- Products Table -->
+                    <app-products-table
                             [portfolio]="portfolio"
-                            [depositSuccess$]="depositSuccess$"
-                            [depositError$]="depositError$"
-                            [depositLoading$]="depositLoading$"
-                            (deposit)="onDeposit($event)">
-                    </app-deposit-form>
+                            [creatingInvestment]="creatingInvestment"
+                            (addProduct)="onCreateInvestment($event)">
+                    </app-products-table>
 
-                    <app-withdrawal-form
-                            [portfolio]="portfolio"
-                            [withdrawalSuccess$]="withdrawalSuccess$"
-                            [withdrawalError$]="withdrawalError$"
-                            [withdrawalLoading$]="withdrawalLoading$"
-                            (withdraw)="onWithdrawal($event)">
-                    </app-withdrawal-form>
-                </div>
+                    <!-- Two Column Layout: Deposit & Withdrawal Forms -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <app-deposit-form
+                                [portfolio]="portfolio"
+                                [depositSuccess$]="depositSuccess$"
+                                [depositError$]="depositError$"
+                                [depositLoading$]="depositLoading$"
+                                (deposit)="onDeposit($event)">
+                        </app-deposit-form>
 
-                <!-- History Tables -->
-                <div class="space-y-8">
-                    <app-deposit-history [depositHistory$]="depositHistory$"></app-deposit-history>
-                    <br>
-                    <app-withdrawal-history
-                            [withdrawalHistory$]="history$"
-                            (downloadCsv)="downloadCsv(portfolio.investorId)">
-                    </app-withdrawal-history>
-                </div>
+                        <app-withdrawal-form
+                                [portfolio]="portfolio"
+                                [withdrawalSuccess$]="withdrawalSuccess$"
+                                [withdrawalError$]="withdrawalError$"
+                                [withdrawalLoading$]="withdrawalLoading$"
+                                (withdraw)="onWithdrawal($event)">
+                        </app-withdrawal-form>
+                    </div>
+
+                    <!-- History Tables -->
+                    <div class="space-y-8">
+                        <app-deposit-history [depositHistory$]="depositHistory$"></app-deposit-history>
+                        <br>
+                        <app-withdrawal-history
+                                [withdrawalHistory$]="history$"
+                                (downloadCsv)="downloadCsv(portfolio.investorId)">
+                        </app-withdrawal-history>
+                    </div>
+                </ng-container>
             </ng-container>
         </app-dashboard-shell>
     `
@@ -108,6 +110,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     investor$: Observable<Investor | null>;
     portfolio$: Observable<Portfolio | null>;
     portfolioLoading$: Observable<boolean>;
+    hasPortfolio$: Observable<boolean>;
+    hasNoPortfolio$: Observable<boolean>;
 
     // Withdrawal
     history$: Observable<WithdrawalHistory[]>;
@@ -131,7 +135,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     @ViewChild(WithdrawalFormComponent) withdrawalFormRef?: WithdrawalFormComponent;
 
     private destroy$ = new Subject<void>();
-    currentInvestorId: number | null = null;
 
     constructor(
         private store: Store,
@@ -142,6 +145,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.investor$ = this.store.select(selectInvestor);
         this.portfolio$ = this.store.select(selectPortfolio);
         this.portfolioLoading$ = this.store.select(selectPortfolioLoading);
+
+        // Derive boolean flags from portfolio$ to control conditional rendering
+        this.hasPortfolio$ = this.portfolio$.pipe(
+            map(p => !!p && Array.isArray(p.products) && p.products.length > 0)
+        );
+        this.hasNoPortfolio$ = this.portfolio$.pipe(
+            map(p => !p || !Array.isArray(p.products) || p.products.length === 0)
+        );
 
         this.history$ = this.store.select(selectWithdrawalHistory);
         this.withdrawalSuccess$ = this.store.select(selectWithdrawalSuccess);
@@ -157,7 +168,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.investor$.pipe(takeUntil(this.destroy$)).subscribe(investor => {
             if (investor?.id) {
-                this.currentInvestorId = investor.id;
                 this.store.dispatch(loadPortfolio({ investorId: investor.id }));
                 this.store.dispatch(loadWithdrawalHistory({ investorId: investor.id }));
                 this.store.dispatch(loadDepositHistory({ investorId: investor.id }));
