@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/auth/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: 'login' }
